@@ -1,7 +1,7 @@
 import streamlit as st
 import openai
 
-openai.api_key =  st.secrets["my_key"]
+openai.api_key =  st.secrets["mykey"]
 
 # Define possible options
 product_features = ["Voice control", "Touch screen interface", "Smart inventory management", "Recipe suggestions"]
