@@ -1,73 +1,55 @@
 import streamlit as st
 import openai
 
+# Set OpenAI API key
 openai.api_key = st.secrets["mykey"]
 
-# Define possible options for each input category
-target_audience = ["Casual gamers", "Hardcore gamers", "Families", "Esports enthusiasts", "Retro gaming fans"]
-game_genres = ["Action", "Adventure", "Role-playing", "Simulation", "Strategy", "Sports", "Puzzle", "Horror", "MMO"]
-platforms = ["PC", "Console", "Mobile", "VR", "Cloud gaming"]
-play_style = ["Single-player", "Multiplayer", "Cooperative", "Competitive"]
-time_commitment = ["Less than 1 hour", "1-3 hours", "3-5 hours", "5+ hours"]
-pain_points = ["Limited playtime", "High hardware requirements", "In-game purchases", "Repetitive gameplay", "Long updates"]
-desires = ["Immersive story", "High-quality graphics", "Challenging gameplay", "Relaxing experience", "Social interaction"]
+# Define possible options
+target_audience = ["Casual gamers", "Competitive players", "Story-driven fans", "Strategists", "Puzzle solvers"]
+game_genres = ["Adventure", "Action", "RPG", "Simulation", "Strategy", "Puzzle", "Sports", "Horror"]
+play_style = ["Single-player", "Multiplayer", "Co-op", "Competitive"]
+pain_points = ["Limited time", "High learning curve", "Lack of guidance", "Repetitive content"]
+desires = ["Engaging storyline", "Relaxing gameplay", "Challenging puzzles", "Fast-paced action", "Immersive graphics"]
+platforms = ["PC", "Console", "Mobile", "VR"]
+time_commitment = ["Short sessions", "Long sessions"]
 
 # Streamlit UI
-st.title("Game Recommendation System")
+st.title("Game Recommender System")
 
 # User input for customization
-col1, col2 = st.columns(2)  # Arrange inputs in two columns for better layout
+selected_audience = st.selectbox("Target Audience:", target_audience)
+selected_genres = st.multiselect("Game Genres:", game_genres)
+selected_play_style = st.selectbox("Play Style:", play_style)
+selected_pain_points = st.multiselect("Pain Points:", pain_points)
+selected_desires = st.multiselect("Desires:", desires)
+selected_platforms = st.multiselect("Preferred Platforms:", platforms)
+selected_time_commitment = st.selectbox("Preferred Session Length:", time_commitment)
 
-with col1:
-    selected_audience = st.selectbox("Target Audience:", target_audience)
-    selected_genres = st.multiselect("Preferred Game Genres:", game_genres)
-    selected_play_style = st.selectbox("Preferred Play Style:", play_style)
-
-with col2:
-    selected_pain_points = st.multiselect("Pain Points:", pain_points)
-    selected_desires = st.multiselect("Desires:", desires)
-    selected_platforms = st.selectbox("Preferred Platform:", platforms)
-    selected_time_commitment = st.selectbox("Preferred Time Commitment:", time_commitment)
-
-# Recommendation logic based on selections
+# Game recommendation logic
 def recommend_games(selected_audience, selected_genres, selected_play_style, selected_pain_points, selected_desires, selected_platforms, selected_time_commitment):
-    recommended_games = []
-    recommended_features = []
+    # Mock game recommendations
+    recommended_games = [
+        {"name": "Stardew Valley", "description": "A relaxing farming simulation game with RPG elements.", "prompt": "A cozy farming game with beautiful landscapes, vibrant farms, and peaceful rural life"},
+        {"name": "God of War", "description": "An action-packed game with Norse mythology.", "prompt": "A fierce warrior in a Norse mythology setting, epic battles, and snowy mountains"},
+        {"name": "The Witcher 3", "description": "An open-world RPG with rich storytelling and complex characters.", "prompt": "A fantasy world with a medieval setting, powerful magic, and mythical creatures"},
+        {"name": "Rocket League", "description": "A fast-paced game that combines soccer with rocket-powered cars.", "prompt": "A stadium with rocket-powered cars playing soccer with giant glowing ball, action-packed scene"},
+        {"name": "Tetris Effect", "description": "A visually immersive and rhythmic twist on the classic Tetris game.", "prompt": "A vibrant, visually stunning Tetris game with glowing blocks and rhythmic lights"}
+    ]
+    return recommended_games
 
-    # Sample recommendation rules based on preferences
-    if selected_audience == "Casual gamers":
-        recommended_games.extend(["Stardew Valley", "Animal Crossing"])
-        recommended_features.extend(["Relaxing gameplay", "Easy to pick up and play"])
-
-    if "Action" in selected_genres:
-        recommended_games.append("God of War")
-        recommended_features.append("Intense action and combat")
-
-    if selected_play_style == "Multiplayer":
-        recommended_games.append("Fortnite")
-        recommended_features.append("Engaging multiplayer experience")
-
-    if "High-quality graphics" in selected_desires:
-        recommended_games.append("Cyberpunk 2077")
-        recommended_features.append("Cutting-edge graphics")
-
-    if selected_platforms == "Mobile":
-        recommended_games.extend(["Clash of Clans", "Candy Crush"])
-        recommended_features.append("Optimized for mobile devices")
-
-    if selected_time_commitment == "Less than 1 hour":
-        recommended_games.append("Among Us")
-        recommended_features.append("Quick gameplay sessions")
-
-    # Remove duplicates to clean up recommendations
-    recommended_games = list(set(recommended_games))
-    recommended_features = list(set(recommended_features))
-
-    return recommended_games, recommended_features
+# Function to generate an image using OpenAI's DALL-E API
+def generate_game_image(prompt):
+    response = openai.Image.create(
+        prompt=prompt,
+        n=1,
+        size="512x512"
+    )
+    return response['data'][0]['url']
 
 # Display recommendations when user clicks the button
 if st.button("Get Recommendations"):
-    games, features = recommend_games(
+    # Get the list of recommended games
+    games = recommend_games(
         selected_audience,
         selected_genres,
         selected_play_style,
@@ -76,8 +58,12 @@ if st.button("Get Recommendations"):
         selected_platforms,
         selected_time_commitment
     )
-    st.subheader("Recommended Games:")
-    st.write(games if games else "No specific recommendations based on current selections.")
     
-    st.subheader("Recommended Features:")
-    st.write(features if features else "No specific recommendations based on current selections.")
+    # Display each recommended game with generated image and description
+    for game in games:
+        st.subheader(game['name'])
+        st.write(game['description'])
+        
+        # Generate an image for each game
+        image_url = generate_game_image(game['prompt'])
+        st.image(image_url, caption=game['name'])
