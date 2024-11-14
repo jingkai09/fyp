@@ -35,6 +35,20 @@ desires = [
     "Character customization", "Educational content", "Stress relief", "Relaxing vibe", 
     "Rich lore and history", "Unpredictable challenges", "Fast-paced action"
 ]
+game_genres = [
+    "Action", "Adventure", "Role-playing", "Simulation", "Strategy", "Sports", 
+    "Puzzle", "Survival horror", "Shooter", "Platformer", "Racing"
+]
+platforms = [
+    "PC", "Console", "Mobile", "VR", "Cross-platform"
+]
+play_style = [
+    "Solo", "Cooperative", "Competitive", "Casual", "Intense"
+]
+time_commitment = [
+    "Short sessions (<30 minutes)", "Moderate (1-2 hours)", "Extended (3+ hours)", 
+    "Varies based on mood"
+]
 
 # Streamlit UI
 st.title("Game Recommendation System")
@@ -43,9 +57,13 @@ st.title("Game Recommendation System")
 selected_audience = st.selectbox("Target Audience:", target_audience)
 selected_pain_points = st.multiselect("Pain Points:", pain_points)
 selected_desires = st.multiselect("Desires:", desires)
+selected_genres = st.multiselect("Preferred Game Genres:", game_genres)
+selected_platforms = st.selectbox("Preferred Platform:", platforms)
+selected_play_style = st.selectbox("Preferred Play Style:", play_style)
+selected_time_commitment = st.selectbox("Preferred Time Commitment:", time_commitment)
 
 # Recommendation logic based on selections
-def recommend_features(selected_audience, selected_pain_points, selected_desires):
+def recommend_features(selected_audience, selected_pain_points, selected_desires, selected_genres, selected_platforms, selected_play_style, selected_time_commitment):
     recommended_features = []
     recommended_benefits = []
 
@@ -54,15 +72,15 @@ def recommend_features(selected_audience, selected_pain_points, selected_desires
         recommended_features.extend(["Multiplayer mode", "Fun in short sessions", "Relaxing gameplay"])
         recommended_benefits.extend(["Quick enjoyment", "Stress relief"])
 
-    if "Engrossing story" in selected_desires:
+    if "Engrossing story" in selected_desires or "Role-playing" in selected_genres:
         recommended_features.append("Story-driven gameplay")
         recommended_benefits.append("Engaging storyline")
 
-    if "Challenging gameplay" in selected_desires:
+    if "Challenging gameplay" in selected_desires or selected_play_style == "Competitive":
         recommended_features.append("Skill-based combat")
         recommended_benefits.append("Skill-building")
 
-    if selected_audience == "Fantasy lovers":
+    if selected_audience == "Fantasy lovers" or "Adventure" in selected_genres:
         recommended_features.extend(["Open world", "In-depth lore", "Character progression"])
         recommended_benefits.append("Immersive experience")
 
@@ -70,21 +88,13 @@ def recommend_features(selected_audience, selected_pain_points, selected_desires
         recommended_features.append("Frequent updates")
         recommended_benefits.append("Consistent fresh content")
 
-    if selected_audience == "Puzzle solvers":
-        recommended_features.extend(["Puzzle-solving mechanics", "Procedural generation"])
-        recommended_benefits.append("Problem-solving skills")
-
-    if "Community engagement" in selected_desires:
+    if selected_play_style == "Cooperative" or selected_platforms == "Cross-platform":
         recommended_features.append("Multiplayer mode")
         recommended_benefits.append("Social interaction")
 
-    if selected_audience == "Competitive players":
-        recommended_features.extend(["Real-time strategy elements", "Cross-platform compatibility"])
-        recommended_benefits.append("Competitive satisfaction")
-
-    if "Relaxing vibe" in selected_desires:
-        recommended_features.append("Relaxing gameplay")
-        recommended_benefits.append("Stress relief")
+    if selected_time_commitment == "Short sessions (<30 minutes)":
+        recommended_features.append("Casual gameplay")
+        recommended_benefits.append("Quick enjoyment")
 
     # Remove duplicates to clean up recommendations
     recommended_features = list(set(recommended_features))
@@ -94,7 +104,10 @@ def recommend_features(selected_audience, selected_pain_points, selected_desires
 
 # Display recommendations when user clicks the button
 if st.button("Get Recommendations"):
-    features, benefits = recommend_features(selected_audience, selected_pain_points, selected_desires)
+    features, benefits = recommend_features(
+        selected_audience, selected_pain_points, selected_desires, 
+        selected_genres, selected_platforms, selected_play_style, selected_time_commitment
+    )
     st.subheader("Recommended Game Features:")
     st.write(features if features else "No specific recommendations based on current selections.")
     
