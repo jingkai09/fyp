@@ -14,7 +14,7 @@ platforms = ["PC", "Console", "Mobile", "VR"]
 time_commitment = ["Short sessions", "Long sessions"]
 
 # Streamlit UI
-st.title("Game Recommender System")
+st.title("Movie Recommender System")
 
 # User input for customization
 selected_audience = st.selectbox("Target Audience:", target_audience)
